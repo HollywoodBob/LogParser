@@ -7,9 +7,6 @@ curl -XPUT $ES/sessions?pretty -H 'Content-Type: application/json' -d'
         "ipAddr": { "type": "ip" },
         "auth": { "type": "text" },
         "timestamp": { "type": "date",
-                      "format": "dd/MMM/YYYY:HH:mm:ss Z"
-        },
-        "startTime": { "type": "date",
                        "format": "epoch_second"
         },
         "endTime": { "type": "date",
