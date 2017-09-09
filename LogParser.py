@@ -161,7 +161,6 @@ try:
                 ef.write("***************************************\n\n")
                 errcnt += 1
                 next
-                #exit(-1)
 
 #            outline = "curl -XPOST $ES/sessions/logEntry/?pretty -H 'Content-Type: application/json' -d'" + doc + "'" + "\n"
 #            print outline
