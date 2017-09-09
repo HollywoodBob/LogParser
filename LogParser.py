@@ -126,6 +126,9 @@ try:
             lat = response.location.latitude
             lon = response.location.longitude
             country_iso = response.country.iso_code
+            state_iso = response.subdivisions.most_specific.iso_code
+            city = response.city.name
+            zip_code = response.postal.code
             try:
                 doc = json.dumps({'ipAddr': fields.ipAddr, \
                               'auth': fields.auth, \
@@ -139,6 +142,9 @@ try:
                               'connectTimeInMinutes': str(int(fields.numDurationTime)/60), \
                               'location': str(lat) + "," + str(lon), \
                               'country_iso': country_iso, \
+                              'state_iso' : state_iso, \
+                              'city' : city, \
+                              'zip_code' : zip_code, \
                               'numDurationTime': fields.numDurationTime}, \
                               separators=(',',':')
                             )
@@ -152,10 +158,6 @@ try:
                 errcnt += 1
                 next
 
-#            outline = "curl -XPOST $ES/sessions/logEntry/?pretty -H 'Content-Type: application/json' -d'" + doc + "'" + "\n"
-#            print outline
-#            output_file.write(outline)
-
             cBulkRecords += 1
             if cBulkRecords % POST_LIMIT:
                 output_bulk_file.write(lineIndex+doc+"\n")
@@ -168,7 +170,6 @@ try:
             break
 finally:
     input_file.close()
-#    output_file.close()
     output_bulk_file.write("\n\'\n")
     writeListenerCount(listenerCount)
     output_bulk_file.close()

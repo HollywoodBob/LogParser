@@ -20,17 +20,13 @@ curl -XPUT $ES/sessions?pretty -H 'Content-Type: application/json' -d'
         "connectTimeInMinutes": { "type": "long" },
         "numDurationTime": { "type": "long" },
         "location": { "type": "geo_point"},
-        "country_iso": {"type": "text"}
-      }
-    },
-    "listenerCountEntry": {
-      "properties": {
-        "lcTimestamp": { "type": "date",
-                       "format": "epoch_second"
-        },
+        "country_iso": {"type": "text"},
+        "state_iso" : {"type": "text"},
+        "city" : {"type": "text"},
+        "zip_code" : {"type": "text"},
         "listenerCount": { "type": "long"}
       }
     }
   }
-}
+
 '
