@@ -14,7 +14,7 @@ import arrow
 
 import json
 
-cLinesToPro     cess = 1000000000000
+cLinesToProcess = 1000000000000
 cOutputRecords = 0
 cBulkRecords = 0
 minDuration = 5
@@ -24,21 +24,16 @@ currentLine = 0
 err_file = "error_log.txt"
 errcnt = 0
 input_file = open('test.log', 'r')
+outputFileName = "put_recs_bulk.sh"
 ELASTIC_INDEX = "test"
 
-def getLocFromIP(IPAddr):
-    loc = {}
-
-
 def getCmdFields(t):
-    # TODO : this assumes 3 fields.  found a Bing Search Bot in Redmond that doesn't send protocol
     # parse error, t is  ['"GET /high.m3u"']
     try:
         t["method"],t["requestURI"],t["protocolVersion"] = t[0].strip('"').split()
     except: # found a Bing Search Bot in Redmond that doesn't send protocol field. only "GET /high.m3u"
         t["method"], t["requestURI"] = t[0].strip('"').split()
         t["protocolVersion"] = "-"
-
 
 def getLogLineBNF():
     global logLineBNF
@@ -64,32 +59,28 @@ def getLogLineBNF():
 		       (integer | "-").setResultsName("numDurationTime"))
     return logLineBNF
 
-def writeListenerCountFile(listenerCount):
-    cBulkRecords = 0
+def writeListenerCount(listenerCount):
     lcHeader = "curl -XPOST $ES/_bulk?pretty -H 'Content-Type: application/x-ndjson' -d'"
-#   lcIndex = "{ \"index\" : { \"_index\" : \"sessions\", \"_type\" : \"listenerCountEntry\"} }\n"
-    lcIndex = "{ \"index\" : { \"_index\" : \"" + ELASTIC_INDEX + "\", \"_type\" : \"listenerCountEntry\"} }\n"
-    lcFile = open('put_recs_listenerCount.sh', 'w')
-    lcFile.write(lineShebang)
-    lcFile.write(lcHeader)
+    cBulkRecords = 0
+    output_bulk_file.write(lcHeader)
+    lcIndex = "{ \"index\" : { \"_index\" : \"" + ELASTIC_INDEX + "\", \"_type\" : \"logEntry\"} }\n"
     for key, value in listenerCount.iteritems():
         cBulkRecords += 1
-        lcData = '{\"lcTimestamp\" : ' + str(key) + ', \"listenerCount\" : ' + str(value) + '}'
+        lcData = '{\"timestamp\" : ' + str(key) + ', \"listenerCount\" : ' + str(value) + '}'
         if cBulkRecords % POST_LIMIT:
-            lcFile.write(lcIndex + lcData + '\n')
+            output_bulk_file.write(lcIndex + lcData + '\n')
         else:
-            lcFile.write("\n\'\n")
-            lcFile.write(lcHeader)
-            lcFile.write(lcIndex + lcData + '\n')
+            output_bulk_file.write("\n\'\n")
+            output_bulk_file.write(lcHeader)
+            output_bulk_file.write(lcIndex + lcData + '\n')
 
-    lcFile.write("\n\'\n")
-    lcFile.close()
+    output_bulk_file.write("\n\'\n")
 
 logLineBNF = None
 listenerCount = {}
 
 #output_file = open('put_recs.sh', 'w')
-output_bulk_file = open('put_recs_bulk.sh','w')
+output_bulk_file = open(outputFileName,'w')
 lineShebang = "#!/usr/bin/env bash\n"
 
 output_bulk_file.write(lineShebang)
@@ -138,8 +129,7 @@ try:
             try:
                 doc = json.dumps({'ipAddr': fields.ipAddr, \
                               'auth': fields.auth, \
-                              'timestamp': fields.timestamp[0] + " " + fields.timestamp[1], \
-                              'startTime': startTime, \
+                              'timestamp': startTime, \
                               'endTime': endTime, \
                               'cmd': fields.mountpoint, \
                               'statusCode': fields.statusCode, \
@@ -180,8 +170,8 @@ finally:
     input_file.close()
 #    output_file.close()
     output_bulk_file.write("\n\'\n")
+    writeListenerCount(listenerCount)
     output_bulk_file.close()
     ef.write("TOTAL ERROR COUNT = " + str(errcnt) + "\n")
     ef.close()
-    writeListenerCountFile(listenerCount)
 
