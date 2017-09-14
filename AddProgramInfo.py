@@ -13,7 +13,13 @@ Blues Festival, Chris Isaak, 2017-06-30T21:00, 2017-06-30T22:15
 Example invocation:
 python AddProgramInfo.py -e 104.199.119.231:9200 -i test < ProgramSchedule.csv
 
+Each line from stdin is echo'ed to stdout before it is processed.
+This script creates the elastic_ubq.json and the update_by_query.sh file for each processed line, and each line
+overwrites these files with the next rendition of content.  When the script exits, these files are NOT cleaned up, so
+one can look at them for debug purposes.
 
+This script enables one to add program information to the elasticsearch index after the icecast logs have been scanned
+and input to the index.
 """
 
 import datetime
@@ -22,6 +28,7 @@ import subprocess
 import sys
 import getopt
 
+#TODO: remove these defaults.
 ELASTICSEARCH_URL = "104.199.119.231:9200"
 ELASTICSEARCH_INDEX = "test"
 
