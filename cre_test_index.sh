@@ -30,6 +30,18 @@ curl -XPUT $ES/test?pretty -H 'Content-Type: application/json' -d'
         "connectTimeInMinutes": { "type": "long" },
         "numDurationTime": { "type": "long" },
         "location": { "type": "geo_point"},
+        "programName": {"type": "text",
+                        "fields" : {
+                          "raw": {
+                            "type": "keyword" }
+                          }
+                        },
+        "artist":   {"type": "text",
+                       "fields" : {
+                         "raw": {
+                           "type": "keyword" }
+                       }
+                     },
         "country_iso": {"type": "text",
                         "fields": {
                            "raw": {

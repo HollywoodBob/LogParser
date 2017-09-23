@@ -1,6 +1,6 @@
 """
 AddProgramInfo.py
-Usage: AddProgramInfo.py -e | --elastic_URL Elasticsearch_URL -i | -- elastic_INDEX Elasticsearch_Index
+Usage: AddProgramInfo.py -e | --elastic_url Elasticsearch_URL -i | --elastic_index Elasticsearch_Index
 This module reads program information lines from stdin and does an update by query into Elasticsearch to add the program
 info to docs that have timestamps corresponding to the program.
 Program information line is comma separated:
@@ -30,7 +30,7 @@ import getopt
 
 #TODO: remove these defaults.
 ELASTICSEARCH_URL = "104.199.119.231:9200"
-ELASTICSEARCH_INDEX = "test"
+ELASTICSEARCH_INDEX = "index_2017"
 
 def process(arg):
     return
@@ -61,15 +61,17 @@ def updateIndexWithProgram(elasticURL, index, programName, artist, startTime, en
     json_file.write("     \"inline\": \"ctx._source.artist = params.artist; ctx._source.programName = params.programName\",\n")
     json_file.write("     \"params\": {\n")
     line = "       \"artist\": \""+artist+"\",\n"
+    # line = "       \"artist\": \"\",\n"
     json_file.write(line)
     line = "       \"programName\": \""+programName+"\"\n"
+    # line = "       \"programName\": \"\"\n"
     json_file.write(line)
     json_file.write("     }\n")
     json_file.write("  },\n")
     #json_file.write("}\n"),
     json_file.write("   \"query\": {\n")
     json_file.write("     \"range\": {\n")
-    json_file.write("       \"timestamp\": {\n")
+    json_file.write("       \"startTime\": {\n")
     json_file.write("         \"gte\": \""+startTime+"\",\n")
     json_file.write("         \"lt\": \""+endTime+"\",\n")
     json_file.write("         \"format\": \"date_optional_time\"\n")
@@ -95,7 +97,7 @@ def main():
 
     # parse command line options
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "he:i:", ["help, elastic_url"])
+        opts, args = getopt.getopt(sys.argv[1:], "he:i:", ["help", "elastic_url=", "elastic_index="])
     except getopt.error, msg:
         print msg
         print "for help use --help"
