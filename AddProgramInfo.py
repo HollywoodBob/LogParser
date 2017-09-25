@@ -118,7 +118,7 @@ def main():
         process(arg) # process() is defined elsewhere
 
     for line in sys.stdin:
-        if line[0] != '#':
+            if line[0] != '#':
             programName, artist, startTime, endTime = parseInput(line)
             updateIndexWithProgram(ELASTICSEARCH_URL, ELASTICSEARCH_INDEX, programName, artist, startTime, endTime)
 
