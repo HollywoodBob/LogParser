@@ -78,22 +78,6 @@ def parseProgramGuideInput(line, year, month, outDict):
             pL.lineDict[k]=outLine
     return pL.lineDict
 
-"""
-outDict = {}
-l1 = "Bob and Eddie Show, Bob, Monday, 08:00, 09:00, 13"
-l2 = "Bob and Eddie Show, Eddie, Monday, 08:00, 09:00, 24"
-ld1 = parseProgramGuideInput(l1, outDict)
-for k in ld1.iterkeys():
-    outDict[k] = ld1[k]
-ld1 = parseProgramGuideInput(l2, outDict)
-for k in ld1.iterkeys():
-    outDict[k] = ld1[k]
-
-for k in sorted(outDict.keys()):
-    print outDict[k]
-#for k in outDict:
-#    print outDict[k]
-"""
 def main():
 
     # parse command line options

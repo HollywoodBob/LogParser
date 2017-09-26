@@ -66,7 +66,13 @@ curl -XPUT ${ELASTIC_URL}/${ELASTIC_INDEX}?pretty -H 'Content-Type: application/
                             "type": "keyword" }
                           }
                         },
-        "artist":   {"type": "text",
+        "host":   {"type": "text",
+                       "fields" : {
+                         "raw": {
+                           "type": "keyword" }
+                       }
+                     },
+        "guest":   {"type": "text",
                        "fields" : {
                          "raw": {
                            "type": "keyword" }

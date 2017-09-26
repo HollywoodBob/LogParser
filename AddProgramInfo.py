@@ -4,7 +4,7 @@ Usage: AddProgramInfo.py -e | --elastic_url Elasticsearch_URL -i | --elastic_ind
 This module reads program information lines from stdin and does an update by query into Elasticsearch to add the program
 info to docs that have timestamps corresponding to the program.
 Program information line is comma separated:
-ProgramName, Artist, StartTime, EndTime
+ProgramName, Host, Guest, StartTime, EndTime
 and a '#' in column 1 indicates a comment
 StartTime and EndTime format is %Y-%m-%dT%H:%M without a timezone specified.  This script assumes Pacific timezone.
 example program information line:
@@ -48,23 +48,24 @@ def parseInput(line):
     print line
     fields = line.split(",")
     programName = fields[0].strip()
-    artist = fields[1].strip()
-    startTime = fields[2].strip()
-    endTime = fields[3].strip()
-    return programName, artist, formatTimeAsPacific(startTime), formatTimeAsPacific(endTime)
+    host = fields[1].strip()
+    guest = fields[2].strip()
+    startTime = fields[3].strip()
+    endTime = fields[4].strip()
+    return programName, host, guest, formatTimeAsPacific(startTime), formatTimeAsPacific(endTime)
 
-def updateIndexWithProgram(elasticURL, index, programName, artist, startTime, endTime):
+def updateIndexWithProgram(elasticURL, index, programName, host, guest, startTime, endTime):
     json_file = open("elastic_ubq.json", "w")
     json_file.write("{\n")
     json_file.write("  \"script\": {\n")
     json_file.write("     \"lang\": \"painless\",\n")
-    json_file.write("     \"inline\": \"ctx._source.artist = params.artist; ctx._source.programName = params.programName\",\n")
+    json_file.write("     \"inline\": \"ctx._source.host = params.host; ctx._source.guest = params.guest; ctx._source.programName = params.programName\",\n")
     json_file.write("     \"params\": {\n")
-    line = "       \"artist\": \""+artist+"\",\n"
-    # line = "       \"artist\": \"\",\n"
+    line = "       \"host\": \""+host+"\",\n"
+    json_file.write(line)
+    line = "       \"guest\": \""+guest+"\",\n"
     json_file.write(line)
     line = "       \"programName\": \""+programName+"\"\n"
-    # line = "       \"programName\": \"\"\n"
     json_file.write(line)
     json_file.write("     }\n")
     json_file.write("  },\n")
@@ -119,8 +120,8 @@ def main():
 
     for line in sys.stdin:
             if line[0] != '#':
-            programName, artist, startTime, endTime = parseInput(line)
-            updateIndexWithProgram(ELASTICSEARCH_URL, ELASTICSEARCH_INDEX, programName, artist, startTime, endTime)
+            programName, host, guest, startTime, endTime = parseInput(line)
+            updateIndexWithProgram(ELASTICSEARCH_URL, ELASTICSEARCH_INDEX, programName, host, guest, startTime, endTime)
 
     return 0
 
